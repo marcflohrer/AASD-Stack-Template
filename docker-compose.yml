@@ -1,0 +1,41 @@
+version: "3.3"
+services:
+    web:
+        build:
+            context: .            
+        container_name: "investor-dashboard"
+        restart: always
+        ports:
+            - "80:44461"
+            - "443:44462"
+        volumes:
+            - ./web/root/.aspnet/DataProtection-Keys:/root/.aspnet/DataProtection-Keys:rw
+            - ./data/logs:/app/logs
+        environment:
+            DOTNET_CLI_TELEMETRY_OPTOUT: 1
+            ASPNETCORE_HTTPS_PORT: 44462
+            ASPNETCORE_URLS: http://+:44461;https://+:44462
+            ASPNETCORE_ENVIRONMENT: Development
+            DOTNET_RUNNING_IN_CONTAINER: true
+            DOTNET_TieredPGO: 1
+            DOTNET_TC_QuickJitForLoops: 1
+            DOTNET_TieredCompilation: 1
+            DOTNET_TC_QuickJit: 1
+            ConnectionStrings__DefaultConnection: "${DatabaseConnectionString}"            
+        depends_on:
+            - invdbdb
+    invdbdb:
+        image: "mcr.microsoft.com/azure-sql-edge:1.0.5"
+        user: root
+        container_name: "investor-dashboard-mssql"
+        restart: always
+        cap_add:
+            - SYS_PTRACE
+        ports:
+            - "1433:1433"
+        volumes:
+            - ./data/mssql/data/:/var/opt/mssql/data
+        environment:
+            MSSQL_SA_PASSWORD: ${DatabasePassword}
+            ACCEPT_EULA: 1
+            MSSQL_PID: Developer

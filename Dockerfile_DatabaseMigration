@@ -1,9 +1,4 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-bullseye-slim AS base
-WORKDIR /app
-
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy@sha256:7c808ca379d3836044627a0bb5d4fc84520f41bca775706d37ca6863fea3567b AS build
 WORKDIR /src
 
 RUN dotnet dev-certs https \
@@ -22,7 +17,7 @@ RUN dotnet build "AspNetAngularTemplate.csproj" -c Release -o /app/build
 FROM build AS publish
 RUN dotnet publish "AspNetAngularTemplate.csproj" -c Release -o /app/publish
 
-FROM base AS final
+FROM publish AS final
 WORKDIR /app
 
 EXPOSE 44461 44462
@@ -30,4 +25,4 @@ EXPOSE 44461 44462
 COPY --from=build /root/.dotnet/corefx/cryptography/x509stores/my/* /root/.dotnet/corefx/cryptography/x509stores/my/
 COPY --from=publish /app/publish .
 
-ENTRYPOINT ["dotnet", "AspNetAngularTemplate.dll"]
+ENTRYPOINT bash ./AspNetAngularTemplate/migrate.sh ${ConnectionString}

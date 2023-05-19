@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+    web:
+        build:
+            args:
+                ConnectionString: "${DatabaseConnectionString};"
+            context: .
+            dockerfile: Dockerfile_DatabaseMigration   
+        container_name: "migration"    
+        ports:
+            - "80:6003"
+            - "443:6004"
+        volumes:
+            - ./web/root/.aspnet/DataProtection-Keys:/root/.aspnet/DataProtection-Keys:rw    
+            - ./Data/Migrations:/app/Data/Migrations:rw          
+        depends_on:
+            - db
+    db:
+        image: "mcr.microsoft.com/azure-sql-edge:1.0.5"
+        user: root        
+        container_name: "mssql"
+        restart: always        
+        ports:
+            - "1433:1433"               
+        volumes:
+            - ./data/mssql/data/:/var/opt/mssql/data
+        environment:
+            MSSQL_SA_PASSWORD: ${DatabasePassword}
+            ACCEPT_EULA: 1
+            MSSQL_PID: Developer
