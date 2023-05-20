@@ -9,8 +9,8 @@ services:
             - "80:44461"
             - "443:44462"
         volumes:
-            - ./web/root/.aspnet/DataProtection-Keys:/root/.aspnet/DataProtection-Keys:rw
-            - ./data/logs:/app/logs
+            - ./AspNetAngularTemplate/web/root/.aspnet/DataProtection-Keys:/root/.aspnet/DataProtection-Keys:rw
+            - ./AspNetAngularTemplate/data/logs:/app/logs
         environment:
             DOTNET_CLI_TELEMETRY_OPTOUT: 1
             ASPNETCORE_HTTPS_PORT: 44462
@@ -23,18 +23,18 @@ services:
             DOTNET_TC_QuickJit: 1
             ConnectionStrings__DefaultConnection: "${DatabaseConnectionString}"            
         depends_on:
-            - invdbdb
-    invdbdb:
+            - db
+    db:
         image: "mcr.microsoft.com/azure-sql-edge:1.0.5"
         user: root
-        container_name: "investor-dashboard-mssql"
+        container_name: "investordb"
         restart: always
         cap_add:
             - SYS_PTRACE
         ports:
             - "1433:1433"
         volumes:
-            - ./data/mssql/data/:/var/opt/mssql/data
+            - ./AspNetAngularTemplate/data/mssql/data/:/var/opt/mssql/data
         environment:
             MSSQL_SA_PASSWORD: ${DatabasePassword}
             ACCEPT_EULA: 1

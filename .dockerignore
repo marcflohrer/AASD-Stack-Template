@@ -8,7 +8,6 @@
 Dockerfile*
 *.md
 **/*.md
-stiebel-eltron-dashboard.db
 .env
 
 # exceptions

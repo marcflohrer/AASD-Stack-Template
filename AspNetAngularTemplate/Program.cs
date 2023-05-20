@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using AspNetAngularTemplate.Data;
 using AspNetAngularTemplate.Models;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.DataProtection;
 
 internal class Program
 {
@@ -12,11 +13,18 @@ internal class Program
         builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
         builder.Configuration.AddJsonFile($"appsettings.{builder.Environment}.json", optional: true);
         builder.Configuration.AddJsonFile($"secrets/appsettings.json", optional: true);
+        builder.Configuration.AddUserSecrets<Program>();
         builder.Configuration.AddEnvironmentVariables();
 
         // Add services to the container.
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        
+        // Create a logger instance of namespace Microsoft.Extensions.Logging
+        var logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<Program>();
+        logger.LogInformation("Connection string: {0}", connectionString);
+        builder.Services.AddSingleton<ILogger>(logger);
+        
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -31,7 +39,8 @@ internal class Program
             .AddIdentityServerJwt();
 
         builder.Services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "SimpleAPI", Version = "v1" }); });
-
+        builder.Services.AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo(@"/root/.aspnet/DataProtection-Keys"));
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
 

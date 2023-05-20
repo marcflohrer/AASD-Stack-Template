@@ -11,8 +11,8 @@ services:
             - "80:6003"
             - "443:6004"
         volumes:
-            - ./web/root/.aspnet/DataProtection-Keys:/root/.aspnet/DataProtection-Keys:rw    
-            - ./Data/Migrations:/app/Data/Migrations:rw          
+            - ./AspNetAngularTemplate/web/root/.aspnet/DataProtection-Keys:/root/.aspnet/DataProtection-Keys:rw    
+            - ./AspNetAngularTemplate/Data/Migrations:/app/Data/Migrations:rw          
         depends_on:
             - db
     db:
@@ -23,7 +23,7 @@ services:
         ports:
             - "1433:1433"               
         volumes:
-            - ./data/mssql/data/:/var/opt/mssql/data
+            - ./AspNetAngularTemplate/data/mssql/data/:/var/opt/mssql/data
         environment:
             MSSQL_SA_PASSWORD: ${DatabasePassword}
             ACCEPT_EULA: 1

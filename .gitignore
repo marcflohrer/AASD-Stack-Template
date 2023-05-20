@@ -407,3 +407,5 @@ ASALocalRun/
 AspNetAngularTemplate/ClientApp/.angular
 web/root/.aspnet/DataProtection-Keys
 data/mssql/data
+AspNetAngularTemplate/web/root/.aspnet/DataProtection-Keys
+AspNetAngularTemplate/Data/mssql/data

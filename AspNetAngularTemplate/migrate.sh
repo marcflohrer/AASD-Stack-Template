@@ -4,7 +4,7 @@ set -e
 
 mkdir -p mssql/data
 
-run_cmd="dotnet stiebel-eltron-dashboard.dll"
+run_cmd="dotnet AspNetAngularTemplate.dll"
 
 >&2 echo "!!!11!!!!!!11!!!!!!11!!!!!!11!!!!!!11!!!"
 >&2 echo "Running entrypoint.sh !!!11!!!!!!11!!!!!"
@@ -19,18 +19,18 @@ done
 >&2 echo "Running entrypoint.sh :: PATH IS SET!!!11!!!!!!11!!!!!"
 >&2 echo "!!!11!!!!!!11!!!!!!11!!!!!!11!!!!!!11!!!1!!!!!!11!!!!!"
 
-dotnet tool update --global dotnet-ef
-
->&2 echo "!!!11!!!!!!11!!!!!!11!!!!!!11!!!!!!11!!!1!!!!!!11!!!!!"
->&2 echo "Running entrypoint.sh :: EF IS INSTALLED !!!!!!11!!!!!"
->&2 echo "!!!11!!!!!!11!!!!!!11!!!!!!11!!!!!!11!!!1!!!!!!11!!!!!"
-
 ConnectionStringName="ConnectionStrings:DefaultConnection"
 dotnet user-secrets init && dotnet user-secrets set "$ConnectionStringName" "$1" --project .
 
 >&2 echo "!!!11!!!!!!11!!!!!!11!!!!!!11!!!!!!11!!!1!!!!!!11!!!!!"
 >&2 echo "Running entrypoint.sh :: 0 SECRETS SET UP $0 !!!!!!!11!!!!!"
 >&2 echo "Running entrypoint.sh :: 1 SECRETS SET UP $1 !!!!!!!11!!!!!"
+>&2 echo "!!!11!!!!!!11!!!!!!11!!!!!!11!!!!!!11!!!1!!!!!!11!!!!!"
+
+dotnet tool update --global dotnet-ef
+
+>&2 echo "!!!11!!!!!!11!!!!!!11!!!!!!11!!!!!!11!!!1!!!!!!11!!!!!"
+>&2 echo "Running entrypoint.sh :: EF IS INSTALLED !!!!!!11!!!!!"
 >&2 echo "!!!11!!!!!!11!!!!!!11!!!!!!11!!!!!!11!!!1!!!!!!11!!!!!"
 
 dotnet build AspNetAngularTemplate.csproj 
