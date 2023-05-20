@@ -1,28 +1,19 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy@sha256:7c808ca379d3836044627a0bb5d4fc84520f41bca775706d37ca6863fea3567b AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy@sha256:7c808ca379d3836044627a0bb5d4fc84520f41bca775706d37ca6863fea3567b AS base
 WORKDIR /src
 
-RUN dotnet dev-certs https \
-    && apt-get update \
-    && apt-get install -y curl \
-    && curl -sL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g @angular/cli
+ENV NODE_VERSION 18.16.0
+ENV NODE_DOWNLOAD_URL https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz
+ENV NODE_DOWNLOAD_SHA FC83046A93D2189D919005A348DB3B2372B598A145D84EB9781A3A4B0F032E95
+
+RUN curl -SL "$NODE_DOWNLOAD_URL" --output nodejs.tar.gz \
+    && echo "$NODE_DOWNLOAD_SHA nodejs.tar.gz" | sha256sum -c - \
+    && tar -xzf "nodejs.tar.gz" -C /usr/local --strip-components=1 \
+    && rm nodejs.tar.gz \
+    && ln -s /usr/local/bin/node /usr/local/bin/nodejs \
+    && node --version
 
 COPY ["AspNetAngularTemplate/AspNetAngularTemplate.csproj", "AspNetAngularTemplate/"]
 RUN dotnet restore "AspNetAngularTemplate/AspNetAngularTemplate.csproj"
-COPY . .
 WORKDIR "/src/AspNetAngularTemplate"
-RUN dotnet build "AspNetAngularTemplate.csproj" -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish "AspNetAngularTemplate.csproj" -c Release -o /app/publish
-
-FROM publish AS final
-WORKDIR /app
-
-EXPOSE 44461 44462
-
-COPY --from=build /root/.dotnet/corefx/cryptography/x509stores/my/* /root/.dotnet/corefx/cryptography/x509stores/my/
-COPY --from=publish /app/publish .
-
-ENTRYPOINT bash ./AspNetAngularTemplate/migrate.sh ${ConnectionString}
+COPY AspNetAngularTemplate/ .
+ENTRYPOINT bash ./migrate.sh ${ConnectionString}
